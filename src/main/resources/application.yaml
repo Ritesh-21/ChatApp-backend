@@ -1,0 +1,69 @@
+spring:
+  datasource:
+    # Environment variable for Railway
+    url: ${DATABASE_URL:jdbc:h2:file:./data/chatdb;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE}
+    driverClassName: org.h2.Driver
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:password}
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false  # Disabled for production
+    properties:
+      hibernate:
+        format_sql: false  # Disabled for production
+
+  h2:
+    console:
+      enabled: false  # Disabled for production (SECURITY!)
+      path: /h2-console
+      settings:
+        web-allow-others: false
+
+  # Email Configuration (Gmail SMTP)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:chatapplication2131@gmail.com}
+    password: ${MAIL_PASSWORD:mgroiixmbmqmajhr}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+jwt:
+  secret: ${JWT_SECRET:myVeryLongSecretKeyForJWTMustBeAtLeast32CharactersLong123456}
+  expiration: ${JWT_EXPIRATION:864000000}
+
+server:
+  port: ${PORT:8080}  # Railway will set PORT automatically
+
+# App base URL - Will be set via environment variables
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8080}
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+
+# Production Logging
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+    com.example.Chat_Application: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Actuator for health checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
