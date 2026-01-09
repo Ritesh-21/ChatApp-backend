@@ -1,0 +1,7 @@
+[phases.build]
+cmds = [
+    "mvn clean install -U -DskipTests"
+]
+
+[phases.start]
+cmd = "java -jar target/Chat-Application-0.0.1-SNAPSHOT.jar"
