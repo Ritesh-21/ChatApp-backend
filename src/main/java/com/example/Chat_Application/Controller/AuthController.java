@@ -1,6 +1,5 @@
 package com.example.Chat_Application.Controller;
 
-
 import com.example.Chat_Application.DTO.LoginRequestDTO;
 import com.example.Chat_Application.DTO.LoginResponseDTO;
 import com.example.Chat_Application.DTO.RegisterRequestDTO;
@@ -18,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +34,6 @@ import java.util.Optional;
 )
 public class AuthController {
 
-
     @Autowired
     private AuthenticationService authenticationService;
 
@@ -49,21 +48,29 @@ public class AuthController {
         return ResponseEntity.ok(authenticationService.signup(registerRequestDTO));
     }
 
+    // ✅ FIXED: Token ab response body mein bhi jayega!
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login(@RequestBody LoginRequestDTO loginRequestDTO){
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDTO loginRequestDTO){
 
         LoginResponseDTO loginResponseDTO = authenticationService.login(loginRequestDTO);
+
+        // Cookie banao (existing code - untouched)
         ResponseCookie responseCookie = ResponseCookie.from("JWT", loginResponseDTO.getToken())
                 .httpOnly(true)
-                .secure(true)  // ✅ Changed to true for Railway (HTTPS)
+                .secure(true)
                 .path("/")
                 .maxAge(1*60*60) //1 Hour
-                .sameSite("None")  // ✅ Changed to None for cross-origin (Vercel to Railway)
+                .sameSite("None")
                 .build();
+
+        // ✅ NEW: Response body mein token + user dono bhejo
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", loginResponseDTO.getToken());
+        response.put("user", loginResponseDTO.getUserDTO());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .body(loginResponseDTO.getUserDTO());
+                .body(response);  // ✅ Ab token visible hoga!
     }
 
     @PostMapping("/logout")
@@ -71,13 +78,11 @@ public class AuthController {
         return authenticationService.logout();
     }
 
-    // ✅ IMPROVED: Redirect to frontend after verification
     @GetMapping("/verify")
     public RedirectView verifyEmail(@RequestParam String token) {
         Optional<User> userOpt = userRepository.findByVerificationToken(token);
 
         if (userOpt.isEmpty()) {
-            // Redirect to frontend with error
             return new RedirectView(frontendUrl + "/login?verified=false&error=invalid_token");
         }
 
@@ -86,7 +91,6 @@ public class AuthController {
         user.setVerificationToken(null);
         userRepository.save(user);
 
-        // Redirect to frontend with success message
         return new RedirectView(frontendUrl + "/login?verified=true");
     }
 
@@ -118,8 +122,7 @@ public class AuthController {
         return userDTO;
     }
 
-    // 🔧 TEMPORARY DEBUG ENDPOINTS - Kaam ho jaye to delete kar dena
-
+    // 🔧 DEBUG ENDPOINTS
     @GetMapping("/debug/users")
     public ResponseEntity<?> debugGetAllUsers() {
         List<User> users = userRepository.findAll();
@@ -143,5 +146,4 @@ public class AuthController {
             return ResponseEntity.ok("✅ User deleted: " + email);
         }).orElse(ResponseEntity.badRequest().body("❌ User not found: " + email));
     }
-
 }
