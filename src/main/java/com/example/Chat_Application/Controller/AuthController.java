@@ -16,6 +16,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -49,10 +50,10 @@ public class AuthController {
         LoginResponseDTO loginResponseDTO = authenticationService.login(loginRequestDTO);
         ResponseCookie responseCookie = ResponseCookie.from("JWT", loginResponseDTO.getToken())
                 .httpOnly(true)
-                .secure(false)  // ✅ For localhost (HTTP not HTTPS)
+                .secure(true)  // ✅ Changed to true for Railway (HTTPS)
                 .path("/")
                 .maxAge(1*60*60) //1 Hour
-                .sameSite("Lax")  // ✅ For cross-origin development
+                .sameSite("None")  // ✅ Changed to None for cross-origin (Vercel to Railway)
                 .build();
 
         return ResponseEntity.ok()
@@ -107,6 +108,32 @@ public class AuthController {
         userDTO.setId(user.getId());
 
         return userDTO;
+    }
+
+    // 🔧 TEMPORARY DEBUG ENDPOINTS - Kaam ho jaye to delete kar dena
+
+    @GetMapping("/debug/users")
+    public ResponseEntity<?> debugGetAllUsers() {
+        List<User> users = userRepository.findAll();
+        return ResponseEntity.ok(users);
+    }
+
+    @PostMapping("/debug/verify-user")
+    public ResponseEntity<?> debugVerifyUser(@RequestParam String email) {
+        return userRepository.findByEmail(email).map(user -> {
+            user.setEmailVerified(true);
+            user.setVerificationToken(null);
+            userRepository.save(user);
+            return ResponseEntity.ok("✅ User verified: " + email);
+        }).orElse(ResponseEntity.badRequest().body("❌ User not found: " + email));
+    }
+
+    @DeleteMapping("/debug/delete-user")
+    public ResponseEntity<?> debugDeleteUser(@RequestParam String email) {
+        return userRepository.findByEmail(email).map(user -> {
+            userRepository.delete(user);
+            return ResponseEntity.ok("✅ User deleted: " + email);
+        }).orElse(ResponseEntity.badRequest().body("❌ User not found: " + email));
     }
 
 }
