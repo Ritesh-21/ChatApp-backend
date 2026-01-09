@@ -22,22 +22,28 @@ spring:
       settings:
         web-allow-others: false
 
-  # Email Configuration (Gmail SMTP) - SSL Port 465
-  mail:
-    host: smtp.gmail.com
-    port: 465
-    username: ${MAIL_USERNAME:chatapplication2131@gmail.com}
-    password: ${MAIL_PASSWORD:mgroiixmbmqmajhr}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          ssl:
-            enable: true
-          socketFactory:
-            port: 465
-            class: javax.net.ssl.SSLSocketFactory
-            fallback: false
+  # OLD SMTP Config (Commented - Railway blocks SMTP ports)
+  # mail:
+  #   host: smtp.gmail.com
+  #   port: 465
+  #   username: ${MAIL_USERNAME:chatapplication2131@gmail.com}
+  #   password: ${MAIL_PASSWORD:mgroiixmbmqmajhr}
+  #   properties:
+  #     mail:
+  #       smtp:
+  #         auth: true
+  #         ssl:
+  #           enable: true
+  #         socketFactory:
+  #           port: 465
+  #           class: javax.net.ssl.SSLSocketFactory
+  #           fallback: false
+
+# SendGrid Configuration (NEW ⭐ - Works on Railway!)
+sendgrid:
+  api-key: ${SENDGRID_API_KEY:your-sendgrid-api-key-here}
+  from-email: ${SENDGRID_FROM_EMAIL:chatapplication2131@gmail.com}
+  from-name: ${SENDGRID_FROM_NAME:Chat Application}
 
 jwt:
   secret: ${JWT_SECRET:myVeryLongSecretKeyForJWTMustBeAtLeast32CharactersLong123456}
