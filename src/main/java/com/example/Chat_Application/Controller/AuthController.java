@@ -78,18 +78,34 @@ public class AuthController {
         return authenticationService.logout();
     }
 
+    // ✅ FINAL FIX: Verify endpoint with better error handling and logging
+
     @GetMapping("/verify")
-    public RedirectView verifyEmail(@RequestParam String token) {
+    public RedirectView verifyEmail(@RequestParam(required = false) String token) {
+
+        System.out.println("🔍 Verify endpoint hit! Token: " + token);
+
+        // Check if token is null or empty
+        if (token == null || token.trim().isEmpty()) {
+            System.out.println("❌ Token is null or empty!");
+            return new RedirectView(frontendUrl + "/login?verified=false&error=missing_token");
+        }
+
         Optional<User> userOpt = userRepository.findByVerificationToken(token);
 
         if (userOpt.isEmpty()) {
+            System.out.println("❌ User not found for token: " + token);
             return new RedirectView(frontendUrl + "/login?verified=false&error=invalid_token");
         }
 
         User user = userOpt.get();
+        System.out.println("✅ User found: " + user.getEmail());
+
         user.setEmailVerified(true);
         user.setVerificationToken(null);
         userRepository.save(user);
+
+        System.out.println("✅ User verified successfully: " + user.getEmail());
 
         return new RedirectView(frontendUrl + "/login?verified=true");
     }
