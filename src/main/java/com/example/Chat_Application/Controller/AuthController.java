@@ -21,6 +21,14 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(
+        origins = {
+                "http://localhost:5173",
+                "https://chat-app-frontend-blue-omega.vercel.app"
+        },
+        allowCredentials = "true",
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}
+)
 public class AuthController {
 
 
