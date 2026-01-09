@@ -22,12 +22,16 @@ public class SendGridEmailService {
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
+    @Value("${app.base-url}")  // ✅ Backend URL add kiya
+    private String baseUrl;
+
     public void sendVerificationEmail(String toEmail, String verificationToken) {
         Email from = new Email(fromEmail, fromName);
         Email to = new Email(toEmail);
         String subject = "Verify Your Email - Chat Application";
 
-        String verificationLink = frontendUrl + "/verify-email?token=" + verificationToken;
+        // ✅ FIXED: Backend verification endpoint use karo (not frontend!)
+        String verificationLink = baseUrl + "/auth/verify?token=" + verificationToken;
 
         String htmlContent = "<!DOCTYPE html>" +
                 "<html>" +

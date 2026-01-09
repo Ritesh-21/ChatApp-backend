@@ -10,11 +10,13 @@ import com.example.Chat_Application.Repository.UserRepository;
 import com.example.Chat_Application.Service.AuthenticationService;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,9 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     @PostMapping("/signup")
     public ResponseEntity<UserDTO> signup(@RequestBody RegisterRequestDTO registerRequestDTO){
@@ -66,12 +71,14 @@ public class AuthController {
         return authenticationService.logout();
     }
 
+    // ✅ IMPROVED: Redirect to frontend after verification
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
+    public RedirectView verifyEmail(@RequestParam String token) {
         Optional<User> userOpt = userRepository.findByVerificationToken(token);
 
         if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Invalid verification token");
+            // Redirect to frontend with error
+            return new RedirectView(frontendUrl + "/login?verified=false&error=invalid_token");
         }
 
         User user = userOpt.get();
@@ -79,7 +86,8 @@ public class AuthController {
         user.setVerificationToken(null);
         userRepository.save(user);
 
-        return ResponseEntity.ok("Email verified successfully! You can now login.");
+        // Redirect to frontend with success message
+        return new RedirectView(frontendUrl + "/login?verified=true");
     }
 
     @GetMapping("/getonlineusers")
