@@ -40,7 +40,7 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
-    @Value("${app.frontend-url}")
+    @Value("${app.frontend-url:https://chat-app-frontend-blue-omega.vercel.app}")
     private String frontendUrl;
 
     @PostMapping("/signup")
@@ -48,29 +48,26 @@ public class AuthController {
         return ResponseEntity.ok(authenticationService.signup(registerRequestDTO));
     }
 
-    // ✅ FIXED: Token ab response body mein bhi jayega!
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDTO loginRequestDTO){
 
         LoginResponseDTO loginResponseDTO = authenticationService.login(loginRequestDTO);
 
-        // Cookie banao (existing code - untouched)
         ResponseCookie responseCookie = ResponseCookie.from("JWT", loginResponseDTO.getToken())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(1*60*60) //1 Hour
+                .maxAge(1*60*60)
                 .sameSite("None")
                 .build();
 
-        // ✅ NEW: Response body mein token + user dono bhejo
         Map<String, Object> response = new HashMap<>();
         response.put("token", loginResponseDTO.getToken());
         response.put("user", loginResponseDTO.getUserDTO());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .body(response);  // ✅ Ab token visible hoga!
+                .body(response);
     }
 
     @PostMapping("/logout")
@@ -78,24 +75,26 @@ public class AuthController {
         return authenticationService.logout();
     }
 
-    // ✅ FINAL FIX: Verify endpoint with better error handling and logging
-
     @GetMapping("/verify")
     public RedirectView verifyEmail(@RequestParam(required = false) String token) {
 
         System.out.println("🔍 Verify endpoint hit! Token: " + token);
+        System.out.println("🌐 Frontend URL: " + frontendUrl);
 
-        // Check if token is null or empty
         if (token == null || token.trim().isEmpty()) {
             System.out.println("❌ Token is null or empty!");
-            return new RedirectView(frontendUrl + "/login?verified=false&error=missing_token");
+            String redirectUrl = frontendUrl + "/login?verified=false&error=missing_token";
+            System.out.println("↪️ Redirecting to: " + redirectUrl);
+            return new RedirectView(redirectUrl);
         }
 
         Optional<User> userOpt = userRepository.findByVerificationToken(token);
 
         if (userOpt.isEmpty()) {
             System.out.println("❌ User not found for token: " + token);
-            return new RedirectView(frontendUrl + "/login?verified=false&error=invalid_token");
+            String redirectUrl = frontendUrl + "/login?verified=false&error=invalid_token";
+            System.out.println("↪️ Redirecting to: " + redirectUrl);
+            return new RedirectView(redirectUrl);
         }
 
         User user = userOpt.get();
@@ -106,8 +105,10 @@ public class AuthController {
         userRepository.save(user);
 
         System.out.println("✅ User verified successfully: " + user.getEmail());
+        String redirectUrl = frontendUrl + "/login?verified=true";
+        System.out.println("↪️ Redirecting to: " + redirectUrl);
 
-        return new RedirectView(frontendUrl + "/login?verified=true");
+        return new RedirectView(redirectUrl);
     }
 
     @GetMapping("/getonlineusers")
@@ -138,7 +139,6 @@ public class AuthController {
         return userDTO;
     }
 
-    // 🔧 DEBUG ENDPOINTS
     @GetMapping("/debug/users")
     public ResponseEntity<?> debugGetAllUsers() {
         List<User> users = userRepository.findAll();
