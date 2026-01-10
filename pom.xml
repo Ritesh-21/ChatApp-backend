@@ -5,7 +5,7 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.9</version>
 		<relativePath/>
-		<!--  lookup parent from repository  -->
+		<!--   lookup parent from repository   -->
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>Chat-Application</artifactId>
@@ -45,38 +45,38 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
-		<!--  https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl  -->
+		<!--   https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl   -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
 			<version>0.13.0</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!--  https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api  -->
+		<!--   https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api   -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
 			<version>0.13.0</version>
 		</dependency>
-		<!--  https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson  -->
+		<!--   https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson   -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.13.0</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!--  Email Verification  -->
+		<!--   Email Verification   -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-		<!--  SendGrid Email Service (NEW ⭐)  -->
+		<!--   Brevo (Sendinblue) Email API - OkHttp Client   -->
 		<dependency>
-			<groupId>com.sendgrid</groupId>
-			<artifactId>sendgrid-java</artifactId>
-			<version>4.10.2</version>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.12.0</version>
 		</dependency>
-		<!--  Google OAuth  -->
+		<!--   Google OAuth   -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>

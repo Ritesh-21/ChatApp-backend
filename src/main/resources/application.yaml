@@ -21,10 +21,10 @@ spring:
       settings:
         web-allow-others: false
 
-sendgrid:
-  api-key: ${SENDGRID_API_KEY:your-sendgrid-api-key-here}
-  from-email: ${SENDGRID_FROM_EMAIL:chatapplication2131@gmail.com}
-  from-name: ${SENDGRID_FROM_NAME:Chat Application}
+brevo:
+  api-key: ${BREVO_API_KEY:your-brevo-api-key-here}
+  from-email: ${BREVO_FROM_EMAIL:chatapplication2131@gmail.com}
+  from-name: ${BREVO_FROM_NAME:Chat Application}
 
 jwt:
   secret: ${JWT_SECRET:myVeryLongSecretKeyForJWTMustBeAtLeast32CharactersLong123456}

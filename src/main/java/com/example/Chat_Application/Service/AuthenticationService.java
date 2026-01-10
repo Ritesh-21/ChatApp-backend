@@ -37,9 +37,9 @@ public class AuthenticationService {
     @Autowired
     private JwtService jwtService;
 
-    // ✅ OLD EmailService removed, NEW SendGridEmailService added
+    // ✅ Brevo Email Service (Fast & Free forever!)
     @Autowired
-    private SendGridEmailService sendGridEmailService;
+    private BrevoEmailService brevoEmailService;
 
     public UserDTO signup(RegisterRequestDTO registerRequestDTO) {
         if(userRepository.findByUsername(registerRequestDTO.getUsername()).isPresent()){
@@ -59,8 +59,8 @@ public class AuthenticationService {
 
         User savedUser = userRepository.save(user);
 
-        // ✅ Send verification email using SendGrid (Railway compatible!)
-        sendGridEmailService.sendVerificationEmail(user.getEmail(), token);
+        // ✅ Send verification email using Brevo (Railway compatible - Fast!)
+        brevoEmailService.sendVerificationEmail(user.getEmail(), token);
 
         return convertToUserDTO(savedUser);
     }
