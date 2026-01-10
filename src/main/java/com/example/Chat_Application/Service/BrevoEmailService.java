@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+
 @Service
 public class BrevoEmailService {
 
@@ -26,7 +27,7 @@ public class BrevoEmailService {
     private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
     public void sendVerificationEmail(String toEmail, String verificationToken) {
-        // ✅ Backend verification endpoint
+        // ✅ Backend verification endpoint (redirect karega frontend pe)
         String verificationLink = baseUrl + "/auth/verify?token=" + verificationToken;
 
         String htmlContent = "<!DOCTYPE html>" +
@@ -64,7 +65,6 @@ public class BrevoEmailService {
                 "</body>" +
                 "</html>";
 
-        // ✅ Brevo API JSON payload
         String jsonPayload = "{"
                 + "\"sender\":{\"name\":\"" + fromName + "\",\"email\":\"" + fromEmail + "\"},"
                 + "\"to\":[{\"email\":\"" + toEmail + "\"}],"
@@ -87,6 +87,7 @@ public class BrevoEmailService {
             Response response = client.newCall(request).execute();
             if (response.isSuccessful()) {
                 System.out.println("✅ Brevo: Verification email sent successfully to: " + toEmail);
+                System.out.println("🔗 Verification link: " + verificationLink);
             } else {
                 System.err.println("❌ Brevo error: " + response.code() + " - " + response.body().string());
                 throw new RuntimeException("Brevo email sending failed with code: " + response.code());
@@ -97,7 +98,6 @@ public class BrevoEmailService {
         }
     }
 
-    // ✅ Helper method to escape JSON special characters in HTML
     private String escapeJson(String input) {
         return input
                 .replace("\\", "\\\\")
